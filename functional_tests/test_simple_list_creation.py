@@ -1,33 +1,11 @@
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from .base import FunctionalTest
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
-
-import os
-os.environ['DJANGO_LIVE_TEST_SERVER_ADDRESS'] = '0.0.0.0:8081'
-
-class NewVisitorTest(StaticLiveServerTestCase):
-
-    def setUp(self):
-        # open firefox browser on selenium hub
-        selenium_hub_url = 'http://192.168.99.100:4444/wd/hub'
-        self.browser = webdriver.Remote(
-                                   command_executor=selenium_hub_url,
-                                   desired_capabilities={"browserName": "firefox"}
-                                   )
-        self.django_url = 'http://192.168.99.100:8081'
-        self.browser.implicitly_wait(3)
-
-    def tearDown(self):
-        self.browser.quit()
-        
-    def check_for_row_in_list_table(self, row_text):
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn(row_text, [row.text for row in rows])
+class NewVisitorTest(FunctionalTest):
 
     def test_can_start_a_list_and_retrieve_it_later(self):          
-        self.browser.get(self.django_url)
+        self.browser.get(self.server_url)
         
         # She notices the page title and header mention to-do lists
         self.assertIn('To-Do', self.browser.title)
@@ -68,7 +46,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
   
         # Francis visits the home page.  There is no sign of Edith's
         # list
-        self.browser.get(self.django_url)
+        self.browser.get(self.server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
@@ -93,24 +71,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
         
         #self.browser.quit()
 
-    def test_layout_and_styling(self):
-        # Edith goes to the home page
-        self.browser.get(self.django_url)
-        self.browser.implicitly_wait(3)
-        self.browser.set_window_size(1024, 768)
-
-        # She notices the input box is nicely centered
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2,
-                               512,
-                               delta=5
-                               )
-        # She starts a new list and sees the input is nicely
-        # centered there too
-        inputbox.send_keys('testing\n')
-        inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(
-                               inputbox.location['x'] + inputbox.size['width'] / 2,
-                               512,
-                               delta=5
-                               )
