@@ -5,10 +5,13 @@ from django.http.request import HttpRequest
 from django.template.loader import render_to_string
 from lists.models import Item, List
 from django.utils.html import escape
+from lists.forms import ItemForm
 
 
 # Create your tests here.
 class HomePageTest (TestCase):
+    maxDiff = None
+    
     def test_root_url_resolve_to_home_page_view(self):
         found = resolve('/')
         self.assertEqual(found.func, home_page)
@@ -16,8 +19,17 @@ class HomePageTest (TestCase):
     def test_home_page_return_correct_html(self):
         request = HttpRequest()
         response = home_page(request)
-        expect_html = render_to_string('home.html')
-        self.assertEqual(response.content.decode(), expect_html)
+        expect_html = render_to_string('home.html',{'form': ItemForm()})
+        self.assertMultiLineEqual(response.content.decode(), expect_html)
+        
+    def test_home_page_renders_home_template(self):
+        response = self.client.get('/')
+        self.assertTemplateUsed(response, 'home.html') #1
+
+
+    def test_home_page_uses_item_form(self):
+        response = self.client.get('/')
+        self.assertIsInstance(response.context['form'], ItemForm) #2
         
 #     def test_home_page_can_save_a_POST_request(self):
 #         request = HttpRequest()
