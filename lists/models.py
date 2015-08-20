@@ -14,4 +14,10 @@ class Item(models.Model):
     text = models.TextField(default='', unique=True)
     list = models.ForeignKey(List, default=None)
     
+    class Meta:
+        #https://docs.djangoproject.com/en/1.8/ref/models/options/
+        unique_together = ('list', 'text')
+        ordering = ('id',)
     
+    def __str__(self):
+        return self.text
