@@ -1,5 +1,6 @@
 from django.test import TestCase
 from lists.models import Item, List
+from django.core.exceptions import ValidationError
 
 
 class ListAndItemModelsTest(TestCase):
@@ -30,3 +31,20 @@ class ListAndItemModelsTest(TestCase):
         self.assertEqual(first_saved_item.list, list_)
         self.assertEqual(second_saved_item.text, 'Item the second')
         self.assertEqual(second_saved_item.list, list_)
+        
+        
+    def test_cannot_save_empty_list_items(self):
+        list_ = List.objects.create()
+        item = Item(list=list_, text='')
+        # This is a new unit testing technique: when we want to check that doing
+        # something will raise an error, we can use the self.assertRaises context manager. 
+        # We could have used something like this instead:   
+        # try:
+        #     item.save()
+        #     self.fail('The save should have raised an exception')
+        #     except ValidationError:
+        # pass
+        with self.assertRaises(ValidationError):
+            item.save()
+            item.full_clean()
+            
