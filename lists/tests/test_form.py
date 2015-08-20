@@ -4,7 +4,7 @@ Created on Aug 20, 2015
 @author: stefania
 '''
 from django.test import TestCase
-from lists.forms import ItemForm
+from lists.forms import EMPTY_ITEM_ERROR, ItemForm
 
 class ItemFromTest(TestCase):
 #     def test_form_renders_item_text_input(self):
@@ -19,4 +19,5 @@ class ItemFromTest(TestCase):
         
     def test_form_validation_for_blank_items(self):
         form = ItemForm(data={'text': ''})
-        form.save()
+        self.assertFalse(form.is_valid(), "Check form is valid")
+        self.assertEqual(form.errors['text'], [EMPTY_ITEM_ERROR], 'Check the error msg is correct.')
