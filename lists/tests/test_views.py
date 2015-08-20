@@ -145,10 +145,9 @@ class ListViewTest(TestCase):
         self.assertNotContains(response, 'other list item 1')
         self.assertNotContains(response, 'other list item 2')
     
-    @skip  
     def post_invalid_input(self):
         list_ = List.objects.create()
-        response = self.client.post(
+        return self.client.post(
             '/lists/%d/' % (list_.id,),
             data={'text': ''}
         )
