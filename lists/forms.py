@@ -43,6 +43,8 @@ class ExistingListItemForm (ItemForm):
     # add parameter for_list in the ExistingListItemForm init
     def __init__(self,for_list, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.instance.list = for_list
+
         
     def validate_unique(self):
         # That’s a bit of Django voodoo right there, 
